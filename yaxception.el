@@ -97,7 +97,7 @@
 (defvar yaxception-err (gensym))
 (defvar yaxception-errsymbol (gensym))
 (defvar yaxception-errcatched (gensym))
-(defvar yaxception-active-p (gensym))
+(defvar yaxception-active-p nil)
 (defvar yaxception-return-value (gensym))
 
 
@@ -149,7 +149,7 @@ Return value is the following.
       (error (message "[yaxception:$] %s" (error-message-string e))))
     `(let* ((,yaxception-err)
             (signal-hook-function 'yaxception-build-stacktrace)
-            (,yaxception-active-p t))
+            (yaxception-active-p t))
        (unwind-protect
            (condition-case ,yaxception-err
                ,try
@@ -353,7 +353,7 @@ List called function and its arguments until error was happened."
                                                                       (+ space))))
 (defun yaxception-build-stacktrace (error-symbol data)
   (ignore-errors
-    (when (symbol-value yaxception-active-p)
+    (when yaxception-active-p
       (with-temp-buffer
         (let ((standard-output (current-buffer))
               (print-escape-newlines t)
