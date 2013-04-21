@@ -1,4 +1,169 @@
-yaxception
-==========
+What's this?
+============
 
-Extension of Emacs that provide coding style like try/catch/finally of Java for elisp
+This is a extension of Emacs provides framework about exception like Java for Elisp.
+
+Feature
+=======
+
+### Grammar like Java's try/catch/finally/throw
+
+You can write like the following about exception.
+
+    (yaxception:$
+      (yaxception:try
+        (delete-file "not found"))
+      (yaxception:catch 'file-error e
+        (message "Error happened by handling file : %s" (yaxception:get-text e)))
+      (yaxception:catch 'error e
+        (message "Error happened by something : %s" (yaxception:get-text e))
+        (yaxception:throw e))
+      (yaxception:finally
+        (message "finished doing")))
+
+### Customized Error
+
+For customizing error, you can write like the following.
+
+    ;; define hoge-error as child of file-error
+    (yaxception:deferror 'hoge-error
+                         'file-error
+                         "Errored by hoge file - path:[%s] size:[%s]" 'path 'size)
+
+    ;; raise customized error
+    (yaxception:throw 'hoge-error
+                      :path "c:/hoge.txt"
+                      :size (nth 7 (file-attributes "c:/hoge.txt")))
+
+### Stacktrace like Java
+
+If want to get stacktrace, the way is only getting the buffer named "\*Backtrace\*" as far as I know.  
+But it has some bad points. List them at the following ...
+
+* It need `(setq debug-on-error t)`.
+* The buffer has trouble for seeing its stacktrace because all of function/special-form shown.
+* Can't get string of stacktrace without popup the buffer.
+
+So, it's enabled that you get the string of stacktrace easy for seeing.  
+For example, you write the following.
+
+    (defun aaa (aa bb &optional cc) (bbb bb))
+    (defun bbb (bb) (ccc))
+    (defun ccc () (replace-regexp-in-string " " "" 'hogege))
+    (defun xxx (zzz) "xxx")
+    (defun yyy () "yyy")
+    
+    (yaxception:$
+      (yaxception:try
+        (xxx "hoge")
+        (yyy)
+        (aaa "ABC" "DEF" '("GHI" "JKL")))
+      (yaxception:catch 'error e
+        (message "%s" (yaxception:get-stack-trace-string e))))
+
+Output the following.
+
+    Exception is 'wrong-type-argument'. Wrong type argument: sequencep, hogege
+      at replace-regexp-in-string(\" \" \"\" hogege)
+      at ccc()
+      at bbb(\"DEF\")
+      at aaa(\"ABC\" \"DEF\" (\"GHI\" \"JKL\"))
+      in yaxception:try
+
+List function only.  
+I want to list macro, but I don't know the way that discriminate macro from builtin special-form.
+
+Install
+=======
+
+You can install by the following way.
+
+### By el-get
+
+It's currently in preparation.
+
+### By auto-install
+
+Eval the following sexp.
+
+    (auto-install-from-url "https://raw.github.com/aki2o/yaxception/master/yaxception.el")
+
+### Otherwise
+
+Download "yaxception.el" manually and put it in your load-path.
+
+Usage
+=====
+
+### Initially
+
+Write the following in the elisp.
+
+    (require 'yaxception)
+
+### Start handling exception
+
+Use `yaxception:$` for starting handling exception.  
+`yaxception:$` receive the following arguments.
+
+1. A sexp of `yaxception:try`.
+2. The sexp of `yaxception:catch` or `yaxception:finally`. This is optional.
+
+`yaxception:$` has the following specification.
+
+* If error is happened while run `yaxception:try`, run `yaxception:catch` that match it first.
+About matching, see "Match exception" section below.
+* If not use `yaxception:catch` matched the happened error, raise its error.
+* Use `yaxception:finally` only once.
+* If has `yaxception:finally`, execute it at last without relation to if error was happened.
+* Return the value that last run sexp other than `yaxception:finally` return.
+
+### Catch exception
+
+Use `yaxception:catch` for each error which you want to catch.  
+
+    (yaxception:catch
+        ;; The error which you want to catch
+        'error
+        ;; The variable which you want to use as the error
+        err
+        ;; If catch the error, run and return the last sexp returned
+        (message "Error happened by something : %s" (yaxception:get-text err))
+        (yaxception:throw err))
+
+### Match exception
+
+Error symbol has `error-conditions`. e.g. `file-error` has `'(file-error error)`.  
+If happen `file-error`,  
+run `(yaxception:catch 'file-error ...)` or `(yaxception:catch 'error ...)` first.
+
+### Throw exception
+
+You can use `yaxception:throw` to signal error anywhere.  
+`yaxception:throw` has the following way for used.
+
+    ;; Throw the error object directly
+    (yaxception:throw err)
+
+    ;; Signal the error of the symbol
+    (yaxception:throw 'file-error)
+
+    ;; If signal, you can give the keyword arguments. You can get them by yaxception:get-prop
+    (yaxception:throw 'hoge-error
+                      :path "c:/hoge.txt"
+                      :size (nth 7 (file-attributes "c:/hoge.txt")))
+
+### Other
+
+For getting the message of the error, you can use `yaxception:get-text`.  
+For getting the property of the error, you can use `yaxception:get-prop`.  
+For getting the stacktrace of the error, you can use `yaxception:get-stack-trace-string`.
+
+Tested On
+=========
+
+* Emacs ... GNU Emacs 23.3.1 (i386-mingw-nt5.1.2600) of 2011-08-15 on GNUPACK
+
+
+**Enjoy!!!**
+
