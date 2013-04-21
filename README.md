@@ -45,7 +45,7 @@ But it has some bad points. List them at the following ...
 * Can't get string of stacktrace without popup the buffer.
 
 So, it's enabled that you get the string of stacktrace easy for seeing.  
-For example, you write the following.
+For example, if you write the following.
 
     (defun aaa (aa bb &optional cc) (bbb bb))
     (defun bbb (bb) (ccc))
@@ -61,7 +61,7 @@ For example, you write the following.
       (yaxception:catch 'error e
         (message "%s" (yaxception:get-stack-trace-string e))))
 
-Output the following.
+Then, output the following.
 
     Exception is 'wrong-type-argument'. Wrong type argument: sequencep, hogege
       at replace-regexp-in-string(\" \" \"\" hogege)
@@ -140,7 +140,7 @@ run `(yaxception:catch 'file-error ...)` or `(yaxception:catch 'error ...)` firs
 ### Throw exception
 
 You can use `yaxception:throw` to signal error anywhere.  
-`yaxception:throw` has the following way for used.
+`yaxception:throw` has the following way for use.
 
     ;; Throw the error object directly
     (yaxception:throw err)
