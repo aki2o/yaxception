@@ -123,10 +123,13 @@ About matching, see "Match exception" section below.
 Use `yaxception:catch` for each error which you want to catch.  
 
     (yaxception:catch
+    
         ;; The error which you want to catch
         'error
+        
         ;; The variable which you want to use as the error
         err
+        
         ;; If catch the error, run and return the last sexp returned
         (message "Error happened by something : %s" (yaxception:get-text err))
         (yaxception:throw err))
@@ -148,10 +151,31 @@ You can use `yaxception:throw` to signal error anywhere.
     ;; Signal the error of the symbol
     (yaxception:throw 'file-error)
 
-    ;; If signal, you can give the keyword arguments. You can get them by yaxception:get-prop
+    ;; If signal, you can give the keyword arguments.
+    ;; Their value is replaced with the special part of the error message.
+    ;; You can get them by yaxception:get-prop.
     (yaxception:throw 'hoge-error
                       :path "c:/hoge.txt"
                       :size (nth 7 (file-attributes "c:/hoge.txt")))
+
+### Customize exception
+
+You can use `yaxception:deferror` to define the customized error.  
+
+    (yaxception:deferror
+    
+     ;; The error symbol. It's OK that it's defined not yet.
+     'hoge-error
+     
+     ;; THe parent of the error. If nil, this value is 'error.
+     'file-error
+     
+     ;; The message of the error. This value is passed to format.
+     "Errored by hoge file - path:[%s] size:[%s]"
+     
+     ;; The keyword symbol replaced with the special part (e.g. %s) of the above message.
+     ;; See "Throw exception" section above.
+     'path 'size)
 
 ### Other
 
