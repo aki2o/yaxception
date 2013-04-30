@@ -262,12 +262,18 @@ List called function and its arguments until error was happened."
              (calllist (when callstack
                          (plist-get callstack :stack)))
              (getliner (lambda (c)
-                         (concat "  at " (plist-get c :name) "(" (plist-get c :argstr) ")"))))
+                         (concat "  at " (plist-get c :name) "(" (plist-get c :argstr) ")")))
+             (ctxtype (plist-get callstack :type))
+             (endline (cond
+                        ((member ctxtype '("try" "catch" "finally"))
+                         (concat "  in yaxception:" ctxtype))
+                        (t
+                         (concat "  in unknown-statment: " ctxtype)))))
         (if (not callstack)
             ""
           (concat "Exception is '" (symbol-name errsymbol) "'. " (error-message-string err) "\n"
                   (mapconcat getliner calllist "\n") "\n"
-                  "  in yaxception:" (plist-get callstack :type))))
+                  endline)))
     (error (message "[yaxception:get-stack-trace-string] %s" (error-message-string e))
            "")))
 
@@ -388,11 +394,10 @@ List called function and its arguments until error was happened."
                                  do (forward-line 1)
                                  finally (let* ((lastf (or (match-string-no-properties 1 line)
                                                            "")))
-                                           (setq ctxtype (cond ((string= lastf "yaxception:try") "try")
-                                                               ((string= lastf "yaxception:catch") "catch")
-                                                               ((string= lastf "yaxception:finally") "finally")))))))
-            (when (not ctxtype)
-              (message "[yaxception] failed get backtrace : not found any yaxception sexp"))
+                                           (setq ctxtype (cond ((string= lastf "yaxception:try")     "try")
+                                                               ((string= lastf "yaxception:catch")   "catch")
+                                                               ((string= lastf "yaxception:finally") "finally")
+                                                               (t                                    lastf)))))))
             (put error-symbol 'yaxception-call-stack `(:type ,ctxtype :stack ,calllist)))
           nil)))))
 
