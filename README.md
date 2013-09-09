@@ -3,6 +3,7 @@ What's this?
 
 This is a extension of Emacs provides framework about exception like Java for Elisp.
 
+
 Feature
 =======
 
@@ -10,30 +11,34 @@ Feature
 
 You can write like the following about exception.
 
-    (yaxception:$
-      (yaxception:try
-        (delete-file "not found"))
-      (yaxception:catch 'file-error e
-        (message "Error happened by handling file : %s" (yaxception:get-text e)))
-      (yaxception:catch 'error e
-        (message "Error happened by something : %s" (yaxception:get-text e))
-        (yaxception:throw e))
-      (yaxception:finally
-        (message "finished doing")))
+```lisp
+(yaxception:$
+  (yaxception:try
+    (delete-file "not found"))
+  (yaxception:catch 'file-error e
+    (message "Error happened by handling file : %s" (yaxception:get-text e)))
+  (yaxception:catch 'error e
+    (message "Error happened by something : %s" (yaxception:get-text e))
+    (yaxception:throw e))
+  (yaxception:finally
+    (message "finished doing")))
+```
 
 ### Customized Error
 
 For customizing error, you can write like the following.
 
-    ;; define hoge-error as child of file-error
-    (yaxception:deferror 'hoge-error
-                         'file-error
-                         "Errored by hoge file - path:[%s] size:[%s]" 'path 'size)
+```lisp
+;; define hoge-error as child of file-error
+(yaxception:deferror 'hoge-error
+                     'file-error
+                     "Errored by hoge file - path:[%s] size:[%s]" 'path 'size)
 
-    ;; raise customized error
-    (yaxception:throw 'hoge-error
-                      :path "c:/hoge.txt"
-                      :size (nth 7 (file-attributes "c:/hoge.txt")))
+;; raise customized error
+(yaxception:throw 'hoge-error
+                  :path "c:/hoge.txt"
+                  :size (nth 7 (file-attributes "c:/hoge.txt")))
+```
 
 ### Stacktrace like Java
 
@@ -47,19 +52,21 @@ But it has some bad points. List them at the following ...
 So, it's enabled that you get the string of stacktrace easy for seeing.  
 For example, if you write the following.
 
-    (defun aaa (aa bb &optional cc) (bbb bb))
-    (defun bbb (bb) (ccc))
-    (defun ccc () (replace-regexp-in-string " " "" 'hogege))
-    (defun xxx (zzz) "xxx")
-    (defun yyy () "yyy")
-    
-    (yaxception:$
-      (yaxception:try
-        (xxx "hoge")
-        (yyy)
-        (aaa "ABC" "DEF" '("GHI" "JKL")))
-      (yaxception:catch 'error e
-        (message "%s" (yaxception:get-stack-trace-string e))))
+```lisp
+(defun aaa (aa bb &optional cc) (bbb bb))
+(defun bbb (bb) (ccc))
+(defun ccc () (replace-regexp-in-string " " "" 'hogege))
+(defun xxx (zzz) "xxx")
+(defun yyy () "yyy")
+
+(yaxception:$
+  (yaxception:try
+    (xxx "hoge")
+    (yyy)
+    (aaa "ABC" "DEF" '("GHI" "JKL")))
+  (yaxception:catch 'error e
+    (message "%s" (yaxception:get-stack-trace-string e))))
+```
 
 Then, output the following.
 
@@ -73,24 +80,28 @@ Then, output the following.
 List function only.  
 I want to list macro, but I don't know the way that discriminate macro from builtin special-form.
 
+
 Install
 =======
 
-You can install by the following way.
+### If use package.el
 
-### By el-get
+2013/07/19 It's available by using melpa.  
+
+### If use el-get.el
 
 2013/07/26 It's available. But, master branch only.  
 
-### By auto-install
+### If use auto-install.el
 
-Eval the following sexp.
+```lisp
+(auto-install-from-url "https://raw.github.com/aki2o/yaxception/master/yaxception.el")
+```
 
-    (auto-install-from-url "https://raw.github.com/aki2o/yaxception/master/yaxception.el")
+### Manually
 
-### Otherwise
+Download yaxception.el and put on your load-path.
 
-Download "yaxception.el" manually and put it in your load-path.
 
 Usage
 =====
@@ -99,7 +110,9 @@ Usage
 
 Write the following in the elisp.
 
-    (require 'yaxception)
+```lisp
+(require 'yaxception)
+```
 
 ### Start handling exception
 
@@ -122,17 +135,19 @@ About matching, see "Match exception" section below.
 
 Use `yaxception:catch` for each error which you want to catch.  
 
-    (yaxception:catch
+```lisp
+(yaxception:catch
+
+    ;; The error which you want to catch
+    'error
     
-        ;; The error which you want to catch
-        'error
-        
-        ;; The variable which you want to use as the error
-        err
-        
-        ;; If catch the error, run and return the last sexp returned
-        (message "Error happened by something : %s" (yaxception:get-text err))
-        (yaxception:throw err))
+    ;; The variable which you want to use as the error
+    err
+    
+    ;; If catch the error, run and return the last sexp returned
+    (message "Error happened by something : %s" (yaxception:get-text err))
+    (yaxception:throw err))
+```
 
 ### Match exception
 
@@ -145,43 +160,48 @@ run `(yaxception:catch 'file-error ...)` or `(yaxception:catch 'error ...)` firs
 You can use `yaxception:throw` to signal error anywhere.  
 `yaxception:throw` has the following way for use.
 
-    ;; Throw the error object directly
-    (yaxception:throw err)
+```lisp
+;; Throw the error object directly
+(yaxception:throw err)
 
-    ;; Signal the error of the symbol
-    (yaxception:throw 'file-error)
+;; Signal the error of the symbol
+(yaxception:throw 'file-error)
 
-    ;; If signal, you can give the keyword arguments.
-    ;; Their value is replaced with the special part of the error message.
-    ;; You can get them by yaxception:get-prop.
-    (yaxception:throw 'hoge-error
-                      :path "c:/hoge.txt"
-                      :size (nth 7 (file-attributes "c:/hoge.txt")))
+;; If signal, you can give the keyword arguments.
+;; Their value is replaced with the special part of the error message.
+;; You can get them by yaxception:get-prop.
+(yaxception:throw 'hoge-error
+                  :path "c:/hoge.txt"
+                  :size (nth 7 (file-attributes "c:/hoge.txt")))
+```
 
 ### Customize exception
 
 You can use `yaxception:deferror` to define the customized error.  
 
-    (yaxception:deferror
-    
-     ;; The error symbol. It's OK that it's defined not yet.
-     'hoge-error
-     
-     ;; THe parent of the error. If nil, this value is 'error.
-     'file-error
-     
-     ;; The message of the error. This value is passed to format.
-     "Errored by hoge file - path:[%s] size:[%s]"
-     
-     ;; The keyword symbol replaced with the special part (e.g. %s) of the above message.
-     ;; See "Throw exception" section above.
-     'path 'size)
+```lisp
+(yaxception:deferror
+
+ ;; The error symbol. It's OK that it's defined not yet.
+ 'hoge-error
+ 
+ ;; THe parent of the error. If nil, this value is 'error.
+ 'file-error
+ 
+ ;; The message of the error. This value is passed to format.
+ "Errored by hoge file - path:[%s] size:[%s]"
+ 
+ ;; The keyword symbol replaced with the special part (e.g. %s) of the above message.
+ ;; See "Throw exception" section above.
+ 'path 'size)
+```
 
 ### Other
 
 For getting the message of the error, you can use `yaxception:get-text`.  
 For getting the property of the error, you can use `yaxception:get-prop`.  
 For getting the stacktrace of the error, you can use `yaxception:get-stack-trace-string`.
+
 
 Tested On
 =========
