@@ -1,5 +1,5 @@
 (require 'yaxception)
-(require 'el-expectations)
+(require 'ert-expectations)
 
 (expectations
   (desc "get-stack-trace-string simple error")
