@@ -5,7 +5,7 @@
 ;; Author: Hiroaki Otsu <ootsuhiroaki@gmail.com>
 ;; Keywords: exception error signal
 ;; URL: https://github.com/aki2o/yaxception
-;; Version: 0.1
+;; Version: 0.2.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -88,6 +88,29 @@
 
 
 (eval-when-compile (require 'cl))
+
+
+(defvar yaxception-debug-enable nil)
+(defvar yaxception-debug-buffer-name "*YAX Debug*")
+
+(defmacro yaxception-debug (msg &rest args)
+  `(when yaxception-debug-enable
+     (condition-case e
+         (with-current-buffer (get-buffer-create yaxception-debug-buffer-name)
+           (goto-char (point-max))
+           (insert (format ,msg ,@args) "\n"))
+       (error (message "[yaxception-debug] %s" (error-message-string e))))))
+
+(defun yaxception:toggle-debug-enable ()
+  "Toggle debug is enabled/disabled."
+  (interactive)
+  (message "Yaxception Debug: %s" (setq yaxception-debug-enable (not yaxception-debug-enable))))
+
+(defun yaxception:clear-debug-log ()
+  "Clear debug log."
+  (interactive)
+  (with-current-buffer (get-buffer-create yaxception-debug-buffer-name)
+    (erase-buffer)))
 
 
 (defstruct yaxception name msgtmpl parent tmplkeys)
@@ -210,14 +233,23 @@ ARGS is anything.
  This format is keyward arguments.
  If given this, get this by `yaxception:get-prop' in `yaxception:catch'."
   (declare (indent 0))
-  `(cond ((ignore-errors (memq 'variable-documentation (symbol-plist ',err_or_errsymbol)))
-          ;; re-throw err
-          (signal (car ,err_or_errsymbol) (cdr ,err_or_errsymbol)))
-         (t
-          ;; throw create error
-          (when (not (yaxception-err-symbol-p ,err_or_errsymbol))
-            (yaxception:deferror ,err_or_errsymbol nil (get 'error 'error-message)))
-          (yaxception-throw-custom-err ,err_or_errsymbol (yaxception-get-err-info-hash ,@args)))))
+  `(progn
+     (yaxception-debug "start throw\n  err: %s\n  args: %s\n  car: %s\n  cdr: %s"
+                       ',err_or_errsymbol
+                       ',args
+                       (ignore-errors (car ,err_or_errsymbol))
+                       (ignore-errors (cdr ,err_or_errsymbol)))
+     (cond ((ignore-errors (memq 'variable-documentation (symbol-plist ',err_or_errsymbol)))
+            ;; re-throw err
+            (signal (car ,err_or_errsymbol) (cdr ,err_or_errsymbol)))
+           ((symbolp ,err_or_errsymbol)
+            ;; throw create error
+            (when (not (yaxception-err-symbol-p ,err_or_errsymbol))
+              (yaxception:deferror ,err_or_errsymbol nil (get 'error 'error-message)))
+            (yaxception-throw-custom-err ,err_or_errsymbol (yaxception-get-err-info-hash ,@args)))
+           (t
+            (message "[yaxception:throw] Illegal argument : %s" ,err_or_errsymbol)
+            (error (format "%s" ,err_or_errsymbol))))))
 
 (defun yaxception:get-text (err)
   "Get message of error.
@@ -279,6 +311,7 @@ List called function and its arguments until error was happened."
 
 
 (defun* yaxception-throw-custom-err (errsymbol errinfoh)
+  (yaxception-debug "start throw custom err : %s" errsymbol)
   (let* ((parents (yaxception-get-err-parents errsymbol))
          (errmsg (yaxception-get-err-msg errsymbol errinfoh)))
     (condition-case e
@@ -289,7 +322,7 @@ List called function and its arguments until error was happened."
                 if (and (symbolp k)
                         (string-match "^:" (symbol-name k)))
                 do (put errsymbol k v)))
-      (error (message "[yaxception:throw] %s" (error-message-string e))))
+      (error (message "[yaxception-throw-custom-err] %s" (error-message-string e))))
     (signal errsymbol (gethash " " errinfoh))))
 
 (defun* yaxception-get-err-info-hash (&rest args &allow-other-keys)
@@ -306,7 +339,7 @@ List called function and its arguments until error was happened."
                      (t
                       (puthash " " e h)))
             finally return h)
-    (error (message "[yaxception:throw] %s" (error-message-string e))
+    (error (message "[yaxception-get-err-info-hash] %s" (error-message-string e))
            (make-hash-table :test 'equal))))
 
 (defun yaxception-get-err-parents (errsymbol)
@@ -319,7 +352,7 @@ List called function and its arguments until error was happened."
           (setq e (or (gethash (symbol-name (yaxception-parent e)) yaxception-custom-err-hash)
                       (yaxception-parent e))))
         (append ret (get e 'error-conditions)))
-    (error (message "[yaxception:throw] %s" (error-message-string e))
+    (error (message "[yaxception-get-err-parents] %s" (error-message-string e))
            '(error))))
 
 (defun yaxception-get-err-msg (errsymbol errinfoh)
@@ -333,7 +366,7 @@ List called function and its arguments until error was happened."
                             for s = (intern (concat ":" (symbol-name k)))
                             collect (gethash s errinfoh))))
         (apply 'format msgtmpl msgargs))
-    (error (message "[yaxception:throw] %s" (error-message-string e))
+    (error (message "[yaxception-get-err-msg] %s" (error-message-string e))
            "")))
 
 (defun yaxception-get-err-symbols ()
