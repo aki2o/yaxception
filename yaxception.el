@@ -1,4 +1,4 @@
-;;; yaxception.el --- provide framework about exception like Java for elisp
+;;; yaxception.el --- Provide framework about exception like Java for Elisp
 
 ;; Copyright (C) 2013  Hiroaki Otsu
 
