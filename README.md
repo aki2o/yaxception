@@ -1,3 +1,5 @@
+![Build Status](https://travis-ci.org/aki2o/yaxception.svg?branch=master)
+
 What's this?
 ============
 
