@@ -87,7 +87,7 @@
 ;; Enjoy!!!
 
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 
 
 (defvar yaxception-debug-enable nil)
