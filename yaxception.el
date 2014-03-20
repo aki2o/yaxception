@@ -239,7 +239,7 @@ ARGS is anything.
                        ',args
                        (ignore-errors (car ,err_or_errsymbol))
                        (ignore-errors (cdr ,err_or_errsymbol)))
-     (cond ((ignore-errors (memq 'variable-documentation (symbol-plist ',err_or_errsymbol)))
+     (cond ((ignore-errors (boundp ',err_or_errsymbol))
             ;; re-throw err
             (signal (car ,err_or_errsymbol) (cdr ,err_or_errsymbol)))
            ((symbolp ,err_or_errsymbol)
