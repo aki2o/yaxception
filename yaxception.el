@@ -5,7 +5,7 @@
 ;; Author: Hiroaki Otsu <ootsuhiroaki@gmail.com>
 ;; Keywords: exception error signal
 ;; URL: https://github.com/aki2o/yaxception
-;; Version: 0.2.0
+;; Version: 0.3.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -122,6 +122,7 @@
 (defvar yaxception-errcatched (gensym))
 (defvar yaxception-active-p nil)
 (defvar yaxception-return-value (gensym))
+(defvar yaxception-signal-hook-function 'yaxception-build-stacktrace)
 
 
 (defun* yaxception:deferror (errsymbol parent errmsgtmpl &rest tmplkeys)
@@ -157,7 +158,9 @@ If has `yaxception:finally', execute it at last without relation to if error was
 
 Return value is the following.
 - If error was not happened, it's a TRY returned value.
-- If error was happened and a matched `yaxception:catch' exist, it's the `yaxception:catch' returned value."
+- If error was happened and a matched `yaxception:catch' exist, it's the `yaxception:catch' returned value.
+
+If you mind the decrease of performance by this function, see `yaxception:$~'."
   (declare (indent 0))
   (lexical-let* (catches finally)
     (condition-case e
@@ -171,7 +174,7 @@ Return value is the following.
                        ((string= symbolnm "yaxception:finally") (setq finally e))))
       (error (message "[yaxception:$] %s" (error-message-string e))))
     `(let* ((,yaxception-err)
-            (signal-hook-function 'yaxception-build-stacktrace)
+            (signal-hook-function yaxception-signal-hook-function)
             (yaxception-active-p t))
        (unwind-protect
            (condition-case ,yaxception-err
@@ -184,6 +187,15 @@ Return value is the following.
                         (signal ,yaxception-errsymbol (cdr ,yaxception-err)))
                       ,yaxception-return-value)))
          ,finally))))
+
+(defmacro* yaxception:$~ (try &rest catch_or_finally)
+  "Wrapper of `yaxception:$' to keep performance.
+
+This function has the following restriction in exchange for performance.
+ - can't use `yaxception:get-stack-trace-string'."
+  (declare (indent 0))
+  `(let ((yaxception-signal-hook-function nil))
+     (yaxception:$ ,try ,@catch_or_finally)))
 
 (defmacro* yaxception:try (&rest body)
   "Execute BODY.

@@ -79,3 +79,18 @@
           (incf i 2)))
       i)))
 
+(expectations
+  (desc "catch-single of yaxception:$~")
+  (expect 5
+    (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
+    (let ((i 0))
+      (yaxception:$~
+        (yaxception:try
+          (yaxception:throw 'yaxception-test-error)
+          (setq i 10))
+        (yaxception:catch 'file-error e
+          (incf i 5))
+        (yaxception:catch 'error e
+          (incf i 2)))
+      i)))
+
