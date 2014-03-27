@@ -5,7 +5,7 @@
 ;; Author: Hiroaki Otsu <ootsuhiroaki@gmail.com>
 ;; Keywords: exception error signal
 ;; URL: https://github.com/aki2o/yaxception
-;; Version: 0.3.0
+;; Version: 0.3.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -48,6 +48,8 @@
 ;; [EVAL] (autodoc-document-lisp-buffer :type 'macro :prefix "yaxception:" :docstring t)
 ;; `yaxception:$'
 ;; Start handling error.
+;; `yaxception:$~'
+;; Wrapper of `yaxception:$' to keep performance.
 ;; `yaxception:try'
 ;; Execute BODY.
 ;; `yaxception:catch'
@@ -87,7 +89,7 @@
 ;; Enjoy!!!
 
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 
 (defvar yaxception-debug-enable nil)
