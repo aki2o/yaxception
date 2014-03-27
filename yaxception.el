@@ -5,7 +5,7 @@
 ;; Author: Hiroaki Otsu <ootsuhiroaki@gmail.com>
 ;; Keywords: exception error signal
 ;; URL: https://github.com/aki2o/yaxception
-;; Version: 0.3.1
+;; Version: 0.3.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@
 ;; Enjoy!!!
 
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 
 
 (defvar yaxception-debug-enable nil)
