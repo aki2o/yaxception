@@ -1,5 +1,5 @@
 (require 'yaxception)
-(require 'ert-expectations)
+(require 'el-expectations)
 
 (expectations
   (desc "catch-nest not catch defined")

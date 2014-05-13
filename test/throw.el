@@ -1,5 +1,5 @@
 (require 'yaxception)
-(require 'ert-expectations)
+(require 'el-expectations)
 
 (expectations
   (desc "throw")
@@ -22,7 +22,7 @@
             (yaxception:catch 'error e
               (yaxception:throw e)))
         (error (setq msg (error-message-string err))))
-      (string-match "\\`Removing old name: no such file or directory" msg))))
+      (string-match "\\`Removing old name: " msg))))
 
 (expectations
   (desc "throw error")

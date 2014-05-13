@@ -1,5 +1,5 @@
 (require 'yaxception)
-(require 'ert-expectations)
+(require 'el-expectations)
 
 (expectations
   (desc "errscope catch")
@@ -22,6 +22,6 @@
           (setq ret2 (error-message-string e)))
         (yaxception:catch 'error e
           (setq ret2 (error-message-string e))))
-      (and (string-match "\\`Removing old name: no such file or directory" ret1)
+      (and (string-match "\\`Removing old name: " ret1)
            (string-match "\\`Wrong type argument: " ret2)))))
 

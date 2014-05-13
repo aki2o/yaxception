@@ -5,6 +5,7 @@
 (package-file "yaxception.el")
 
 (development
- (depends-on "ert")
- (depends-on "el-mock")
- (depends-on "ert-expectations"))
+ (depends-on "tenv" :git "https://github.com/aki2o/elisp-test.git" :files ("tenv.el"))
+ (depends-on "el-expectations" :git "https://github.com/aki2o/elisp-test.git" :files ("el-expectations.el"))
+ (depends-on "el-mock"))
+
