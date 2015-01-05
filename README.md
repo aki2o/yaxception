@@ -114,7 +114,7 @@ Write the following in the elisp.
 
 Use `yaxception:$` for starting handling exception.  
 `yaxception:$` receive the following arguments.  
-1.  A sexp of `yaxception:try`.
+1.  A sexp of `yaxception:try` .
 2.  The sexp of `yaxception:catch` or `yaxception:finally`. This is optional.
 
 `yaxception:$` has the following specification.  
