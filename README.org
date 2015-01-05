@@ -119,12 +119,12 @@ Exception is 'wrong-type-argument'. Wrong type argument: sequencep, hogege
 *** Start handling exception
 
     Use =yaxception:$= for starting handling exception.  
-    =yaxception:$= receive the following arguments.
+    =yaxception:$= receive the following arguments.  
 
     1. A sexp of =yaxception:try=.
     2. The sexp of =yaxception:catch= or =yaxception:finally=. This is optional.
 
-    =yaxception:$= has the following specification.
+    =yaxception:$= has the following specification.  
 
     - If error is happened while run =yaxception:try=, run =yaxception:catch= that match it first.
       About matching, see "Match exception" section below.
