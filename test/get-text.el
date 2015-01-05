@@ -10,9 +10,7 @@
           (replace-regexp-in-string " " "" 'yaxception-active-p))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-text e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-text custom error")
   (expect "This is YAX 'hoge' test."
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
@@ -22,9 +20,7 @@
           (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-text e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-text typo")
   (expect ""
     (let ((ret "hoge"))
@@ -33,9 +29,7 @@
           (replace-regexp-in-string " " "" 'yaxception-active-p))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-text ret))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-text message when error")
   (expect "[yaxception:get-text] Wrong type argument: listp, \"\""
     (let ((ret ""))
@@ -47,5 +41,6 @@
              (replace-regexp-in-string " " "" 'yaxception-active-p))
            (yaxception:catch 'error e
              (yaxception:get-text ret)))))
-      ret)))
+      ret))
+  )
 

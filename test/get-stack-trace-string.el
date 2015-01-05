@@ -12,9 +12,7 @@
           (replace-regexp-in-string " " "" 'yaxception-active-p))
         (yaxception:catch 'wrong-type-argument e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string not exist function")
   (expect "Exception is 'void-function'. Symbol's function definition is void: yaxception-zzz
 
@@ -25,9 +23,7 @@
           (yaxception-zzz))
         (yaxception:catch 'void-function e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string call functions")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -48,9 +44,7 @@
           (yaxception-aaa))
         (yaxception:catch 'wrong-type-argument e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string call functions has arguments")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -71,9 +65,7 @@
           (yaxception-aaa "ABC" "DEF" '("GHI" "JKL")))
         (yaxception:catch 'wrong-type-argument e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string catch as parent symbol")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -94,9 +86,7 @@
           (yaxception-aaa "ABC" "DEF" '("GHI" "JKL")))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string nest syntax")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -121,9 +111,7 @@
               (setq ret (yaxception:get-stack-trace-string e)))))
         (yaxception:catch 'error e
           (setq ret "Catch at parent")))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string error in catch")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -148,9 +136,7 @@
               (yaxception-aaa "ZYX" "WVU"))))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string error in finally")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -177,9 +163,7 @@
               (yaxception-aaa "ZYX" "WVU"))))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string error in finally 2")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at replace-regexp-in-string(\" \" \"\" yaxception-active-p)
@@ -203,9 +187,7 @@
               (yaxception-aaa "ZYX" "WVU"))))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string error by throw")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at signal(wrong-type-argument (sequencep yaxception-active-p))
@@ -228,9 +210,7 @@
               (yaxception:throw e))))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string error by custom throw")
   (expect "Exception is 'yaxception-test-error'. This is YAX 'hoge' test.
   at signal(yaxception-test-error nil)
@@ -254,9 +234,7 @@
               (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-stack-trace-string error from not catch sexp")
   (expect "Exception is 'wrong-type-argument'. Wrong type argument: sequencep, yaxception-active-p
   at signal(wrong-type-argument (sequencep yaxception-active-p))
@@ -276,5 +254,6 @@
               (yaxception-aaa "ABC" "DEF" '("GHI" "JKL")))))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-stack-trace-string e))))
-      ret)))
+      ret))
+  )
 

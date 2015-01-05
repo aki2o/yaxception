@@ -3,7 +3,7 @@
 
 (expectations
   (desc "errscope catch")
-  (expect 0
+  (expect t
     (let ((ret1 "")
           (ret2 "")
           (i 0))
@@ -22,6 +22,8 @@
           (setq ret2 (error-message-string e)))
         (yaxception:catch 'error e
           (setq ret2 (error-message-string e))))
-      (and (string-match "\\`Removing old name: " ret1)
-           (string-match "\\`Wrong type argument: " ret2)))))
+      (or (and (string-match "\\`Removing old name: " ret1)
+               (string-match "\\`Wrong type argument: " ret2)
+               t)
+          (concat ret1 "\n" ret2)))))
 

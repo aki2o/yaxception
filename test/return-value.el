@@ -8,9 +8,7 @@
     (yaxception:$
       (yaxception:try
         "hoge"
-        "fuga"))))
-
-(expectations
+        "fuga")))
   (desc "return-value when not error has catch")
   (expect "fuga"
     (yaxception:$
@@ -18,9 +16,7 @@
         "hoge"
         "fuga")
       (yaxception:catch 'error e
-        "foo"))))
-
-(expectations
+        "foo")))
   (desc "return-value when not error has finally")
   (expect "fuga"
     (yaxception:$
@@ -28,9 +24,7 @@
         "hoge"
         "fuga")
       (yaxception:finally
-        "foo"))))
-
-(expectations
+        "foo")))
   (desc "return-value when error")
   (expect "foo"
     (yaxception:$
@@ -39,9 +33,7 @@
         (error "It's test error")
         "fuga")
       (yaxception:catch 'error e
-        "foo"))))
-
-(expectations
+        "foo")))
   (desc "return-value when error has finally")
   (expect "bar"
     (yaxception:$
@@ -53,5 +45,6 @@
         "foo"
         "bar")
       (yaxception:finally
-        "baz"))))
+        "baz")))
+  )
 

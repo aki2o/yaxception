@@ -8,11 +8,9 @@
       (condition-case err
           (yaxception:throw 'file-error)
         (error (setq msg (error-message-string err))))
-      msg)))
-
-(expectations
+      msg))
   (desc "throw re")
-  (expect 0
+  (expect t
     (let ((msg ""))
       (condition-case err
           (yaxception:$
@@ -22,9 +20,7 @@
             (yaxception:catch 'error e
               (yaxception:throw e)))
         (error (setq msg (error-message-string err))))
-      (string-match "\\`Removing old name: " msg))))
-
-(expectations
+      (and (string-match "\\`Removing old name: " msg) t)))
   (desc "throw error")
   (expect "File error"
     (let ((msg ""))
@@ -36,9 +32,7 @@
             (yaxception:catch 'error e
               (yaxception:throw 'file-error)))
         (error (setq msg (error-message-string err))))
-      msg)))
-
-(expectations
+      msg))
   (desc "throw custom error")
   (expect "This is YAX 'hoge' test."
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
@@ -51,5 +45,6 @@
             (yaxception:catch 'error e
               (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga")))
         (error (setq msg (error-message-string err))))
-      msg)))
+      msg))
+  )
 

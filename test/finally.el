@@ -13,9 +13,7 @@
           (setq msg (concat msg "Caught")))
         (yaxception:finally
           (setq msg (concat msg "Finished"))))
-      msg)))
-
-(expectations
+      msg))
   (desc "finally do nest")
   (expect "ThrowingFinishedCaughtComplete"
     (let ((msg ""))
@@ -34,5 +32,6 @@
           (setq msg (concat msg "Caught")))
         (yaxception:finally
           (setq msg (concat msg "Complete"))))
-      msg)))
+      msg))
+  )
 

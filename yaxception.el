@@ -5,7 +5,7 @@
 ;; Author: Hiroaki Otsu <ootsuhiroaki@gmail.com>
 ;; Keywords: exception error signal
 ;; URL: https://github.com/aki2o/yaxception
-;; Version: 0.3.2
+;; Version: 0.3.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -89,6 +89,7 @@
 ;; Enjoy!!!
 
 
+;;; Code:
 (require 'cl)
 
 
@@ -376,6 +377,7 @@ List called function and its arguments until error was happened."
                          (yaxception-tmplkeys e)))
              (msgtmpl (cond ((yaxception-p e) (yaxception-msgtmpl e))
                             (t                (get errsymbol 'error-message))))
+             (msgtmpl (if (functionp msgtmpl) (funcall msgtmpl) msgtmpl))
              (msgargs (loop for k in tmplkeys
                             for s = (intern (concat ":" (symbol-name k)))
                             collect (gethash s errinfoh))))

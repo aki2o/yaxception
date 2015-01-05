@@ -11,9 +11,7 @@
           (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-prop e 'yax-a))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-prop undefined prop")
   (expect "fuga"
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
@@ -23,9 +21,7 @@
           (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-prop e 'yax-b))))
-      ret)))
-
-(expectations
+      ret))
   (desc "get-prop not exist")
   (expect nil
     (let ((ret ""))
@@ -34,5 +30,6 @@
           (replace-regexp-in-string " " "" 'yaxception-active-p))
         (yaxception:catch 'error e
           (setq ret (yaxception:get-prop e 'something))))
-      ret)))
+      ret))
+  )
 

@@ -5,16 +5,13 @@
 (expectations
   (desc "err-symbol-p message is not err symbol")
   (expect nil
-    (yaxception-err-symbol-p 'message)))
-
-(expectations
+    (yaxception-err-symbol-p 'message))
   (desc "err-symbol-p file-error is err symbol")
   (expect t
-    (yaxception-err-symbol-p 'file-error)))
-
-(expectations
+    (yaxception-err-symbol-p 'file-error))
   (desc "err-symbol-p symbol by deferror is err symbol")
   (expect t
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX test.")
-    (yaxception-err-symbol-p 'yaxception-test-error)))
+    (yaxception-err-symbol-p 'yaxception-test-error))
+  )
 

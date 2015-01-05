@@ -9,9 +9,7 @@
         (yaxception:try
           (setq i 10)
           (incf i)
-          i)))))
-
-(expectations
+          i))))
   (desc "catch-single not catch")
   (expect 11
     (let ((i 0))
@@ -21,9 +19,7 @@
           (incf i)
           i)
         (yaxception:catch 'error e
-          (incf i 2))))))
-
-(expectations
+          (incf i 2)))))
   (desc "catch-single catch")
   (expect 2
     (let ((i 0))
@@ -33,9 +29,7 @@
           (setq i 10))
         (yaxception:catch 'error e
           (incf i 2)))
-      i)))
-
-(expectations
+      i))
   (desc "catch-single catch match error")
   (expect 5
     (let ((i 0))
@@ -47,9 +41,7 @@
           (incf i 5))
         (yaxception:catch 'error e
           (incf i 2)))
-      i)))
-
-(expectations
+      i))
   (desc "catch-single catch custom error")
   (expect 5
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
@@ -62,9 +54,7 @@
           (incf i 5))
         (yaxception:catch 'error e
           (incf i 2)))
-      i)))
-
-(expectations
+      i))
   (desc "catch-single catch parent error")
   (expect 5
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
@@ -77,9 +67,7 @@
           (incf i 5))
         (yaxception:catch 'error e
           (incf i 2)))
-      i)))
-
-(expectations
+      i))
   (desc "catch-single of yaxception:$~")
   (expect 5
     (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
@@ -92,5 +80,6 @@
           (incf i 5))
         (yaxception:catch 'error e
           (incf i 2)))
-      i)))
+      i))
+  )
 
