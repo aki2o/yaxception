@@ -1,17 +1,14 @@
 [![Build Status](https://travis-ci.org/aki2o/yaxception.svg?branch=master)](https://travis-ci.org/aki2o/yaxception)
 
-What's this?
-============
+# What's this?
 
-This is a extension of Emacs provides framework about exception like Java for Elisp.
+This is a extension of Emacs provides framework about exception like Java for Elisp.  
 
-
-Feature
-=======
+# Feature
 
 ### Grammar like Java's try/catch/finally/throw
 
-You can write like the following about exception.
+You can write like the following about exception.  
 
 ```lisp
 (yaxception:$
@@ -28,7 +25,7 @@ You can write like the following about exception.
 
 ### Customized Error
 
-For customizing error, you can write like the following.
+For customizing error, you can write like the following.  
 
 ```lisp
 ;; define hoge-error as child of file-error
@@ -44,12 +41,11 @@ For customizing error, you can write like the following.
 
 ### Stacktrace like Java
 
-If want to get stacktrace, the way is only getting the buffer named "\*Backtrace\*" as far as I know.  
-But it has some bad points. List them at the following ...
-
-* It need `(setq debug-on-error t)`.
-* The buffer has trouble for seeing its stacktrace because all of function/special-form shown.
-* Can't get string of stacktrace without popup the buffer.
+If want to get stacktrace, the way is only getting the buffer named "\\\*Backtrace\\\*" as far as I know.  
+But it has some bad points. List them at the following &#x2026;
+-   It need `(setq debug-on-error t)`.
+-   The buffer has trouble for seeing its stacktrace because all of function/special-form shown.
+-   Can't get string of stacktrace without popup the buffer.
 
 So, it's enabled that you get the string of stacktrace easy for seeing.  
 For example, if you write the following.
@@ -72,19 +68,19 @@ For example, if you write the following.
 
 Then, output the following.
 
-    Exception is 'wrong-type-argument'. Wrong type argument: sequencep, hogege
-      at replace-regexp-in-string(\" \" \"\" hogege)
-      at ccc()
-      at bbb(\"DEF\")
-      at aaa(\"ABC\" \"DEF\" (\"GHI\" \"JKL\"))
-      in yaxception:try
+```
+Exception is 'wrong-type-argument'. Wrong type argument: sequencep, hogege
+  at replace-regexp-in-string(\" \" \"\" hogege)
+  at ccc()
+  at bbb(\"DEF\")
+  at aaa(\"ABC\" \"DEF\" (\"GHI\" \"JKL\"))
+  in yaxception:try
+```
 
 List function only.  
 I want to list macro, but I don't know the way that discriminate macro from builtin special-form.
 
-
-Install
-=======
+# Install
 
 ### If use package.el
 
@@ -102,11 +98,9 @@ Install
 
 ### Manually
 
-Download yaxception.el and put on your load-path.
+Download yaxception.el and put it on your load-path.  
 
-
-Usage
-=====
+# Usage
 
 ### Initially
 
@@ -120,18 +114,17 @@ Write the following in the elisp.
 
 Use `yaxception:$` for starting handling exception.  
 `yaxception:$` receive the following arguments.
-
-1. A sexp of `yaxception:try`.
-2. The sexp of `yaxception:catch` or `yaxception:finally`. This is optional.
+1.  A sexp of `yaxception:try`.
+2.  The sexp of `yaxception:catch` or `yaxception:finally`. This is optional.
 
 `yaxception:$` has the following specification.
 
-* If error is happened while run `yaxception:try`, run `yaxception:catch` that match it first.
-About matching, see "Match exception" section below.
-* If not use `yaxception:catch` matched the happened error, raise its error.
-* Use `yaxception:finally` only once.
-* If has `yaxception:finally`, execute it at last without relation to if error was happened.
-* Return the value that last run sexp other than `yaxception:finally` return.
+-   If error is happened while run `yaxception:try`, run `yaxception:catch` that match it first.
+    About matching, see "Match exception" section below.
+-   If not use `yaxception:catch` matched the happened error, raise its error.
+-   Use `yaxception:finally` only once.
+-   If has `yaxception:finally`, execute it at last without relation to if error was happened.
+-   Return the value that last run sexp other than `yaxception:finally` return.
 
 ### Catch exception
 
@@ -142,10 +135,10 @@ Use `yaxception:catch` for each error which you want to catch.
 
     ;; The error which you want to catch
     'error
-    
+
     ;; The variable which you want to use as the error
     err
-    
+
     ;; If catch the error, run and return the last sexp returned
     (message "Error happened by something : %s" (yaxception:get-text err))
     (yaxception:throw err))
@@ -153,7 +146,7 @@ Use `yaxception:catch` for each error which you want to catch.
 
 ### Match exception
 
-Error symbol has `error-conditions`. e.g. `file-error` has `'(file-error error)`.  
+Error symbol has `error-conditions`. e.g. `file-error` has ='(file-error error)=.  
 If happen `file-error`,  
 run `(yaxception:catch 'file-error ...)` or `(yaxception:catch 'error ...)` first.
 
@@ -186,13 +179,13 @@ You can use `yaxception:deferror` to define the customized error.
 
  ;; The error symbol. It's OK that it's defined not yet.
  'hoge-error
- 
+
  ;; THe parent of the error. If nil, this value is 'error.
  'file-error
- 
+
  ;; The message of the error. This value is passed to format.
  "Errored by hoge file - path:[%s] size:[%s]"
- 
+
  ;; The keyword symbol replaced with the special part (e.g. %s) of the above message.
  ;; See "Throw exception" section above.
  'path 'size)
@@ -204,12 +197,21 @@ For getting the message of the error, you can use `yaxception:get-text`.
 For getting the property of the error, you can use `yaxception:get-prop`.  
 For getting the stacktrace of the error, you can use `yaxception:get-stack-trace-string`.
 
+# Consideration
 
-Tested On
-=========
+### Get stack trace with keep performance
 
-* Emacs ... GNU Emacs 23.3.1 (i386-mingw-nt5.1.2600) of 2011-08-15 on GNUPACK
+`yaxception:$` makes a stack trace using `signal-hook-function` when error happens.  
+Normarlly, the cost almost don't come a trouble. However, it happens a slowness in a few case.  
+At present, here is the well-known cases.  
+-   use the features of `defclass`
 
+If your code matches them in `yaxception:$`, it's recommended to use `yaxception:$~`
+as substitute for that.  
+`yaxception:$~` keeps a performance in exchange for not making a stack trace.  
+
+# Tested On
+
+-   Emacs &#x2026; GNU Emacs 23.3.1 (i386-mingw-nt5.1.2600) of 2011-08-15 on GNUPACK
 
 **Enjoy!!!**
-
