@@ -146,7 +146,7 @@ Use `yaxception:catch` for each error which you want to catch.
 
 ### Match exception
 
-Error symbol has `error-conditions`. e.g. `file-error` has ='(file-error error)=.  
+Error symbol has `error-conditions`. e.g. `file-error` has `(file-error error)`.  
 If happen `file-error`,  
 run `(yaxception:catch 'file-error ...)` or `(yaxception:catch 'error ...)` first.
 
