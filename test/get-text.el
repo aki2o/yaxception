@@ -1,46 +1,43 @@
 (require 'yaxception)
-(require 'el-expectations)
 
-(expectations
-  (desc "get-text builtin error")
-  (expect "Wrong type argument: sequencep, yaxception-active-p"
-    (let ((ret ""))
-      (yaxception:$
-        (yaxception:try
-          (replace-regexp-in-string " " "" 'yaxception-active-p))
-        (yaxception:catch 'error e
-          (setq ret (yaxception:get-text e))))
-      ret))
-  (desc "get-text custom error")
-  (expect "This is YAX 'hoge' test."
-    (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
-    (let ((ret ""))
-      (yaxception:$
-        (yaxception:try
-          (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
-        (yaxception:catch 'error e
-          (setq ret (yaxception:get-text e))))
-      ret))
-  (desc "get-text typo")
-  (expect ""
-    (let ((ret "hoge"))
-      (yaxception:$
-        (yaxception:try
-          (replace-regexp-in-string " " "" 'yaxception-active-p))
-        (yaxception:catch 'error e
-          (setq ret (yaxception:get-text ret))))
-      ret))
-  (desc "get-text message when error")
-  (expect "[yaxception:get-text] Wrong type argument: listp, \"\""
-    (let ((ret ""))
-      (ad-with-auto-activation-disabled
-       (flet ((message (format-string &rest args)
-                       (setq ret (apply 'format format-string args))))
-         (yaxception:$
-           (yaxception:try
-             (replace-regexp-in-string " " "" 'yaxception-active-p))
-           (yaxception:catch 'error e
-             (yaxception:get-text ret)))))
-      ret))
-  )
+(ert-deftest get-text/builtin ()
+  "get-text with builtin error"
+  (let ((ret ""))
+    (yaxception:$
+      (yaxception:try
+        (replace-regexp-in-string " " "" 'yaxception))
+      (yaxception:catch 'error e
+        (setq ret (yaxception:get-text e))))
+    (should (equal ret "Wrong type argument: sequencep, yaxception"))))
 
+(ert-deftest get-text/original ()
+  "get-text with original error"
+  (unwind-protect
+      (let ((ret ""))
+        (define-error 'yaxception-test-error "This is YAX test" 'void-function)
+        (yaxception:$
+          (yaxception:try
+            (yaxception:throw 'yaxception-test-error))
+          (yaxception:catch 'error e
+            (setq ret (yaxception:get-text e))))
+        (should (equal ret "This is YAX test"))
+        (yaxception:$
+          (yaxception:try
+            (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
+          (yaxception:catch 'error e
+            (setq ret (yaxception:get-text e))))
+        (should (equal ret "This is YAX test: :yax-a, \"hoge\", :yax-b, \"fuga\"")))
+    (setplist 'yaxception-test-error nil)))
+
+(ert-deftest get-text/wrong-argument ()
+  "get-text with wrong argument"
+  (let* ((ret "hoge")
+         (err (should-error
+               (yaxception:$
+                 (yaxception:try
+                   (replace-regexp-in-string " " "" 'yaxception))
+                 (yaxception:catch 'error e
+                   (setq ret (yaxception:get-text ret))))
+               :type 'error)))
+    (should (equal ret "hoge"))
+    (should (equal (error-message-string err) "[yaxception:get-raw] Invalid argument : hoge"))))

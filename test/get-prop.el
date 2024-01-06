@@ -1,35 +1,17 @@
 (require 'yaxception)
-(require 'el-expectations)
 
-(expectations
-  (desc "get-prop defined prop")
-  (expect "hoge"
-    (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
-    (let ((ret ""))
-      (yaxception:$
-        (yaxception:try
-          (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
-        (yaxception:catch 'error e
-          (setq ret (yaxception:get-prop e 'yax-a))))
-      ret))
-  (desc "get-prop undefined prop")
-  (expect "fuga"
-    (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
-    (let ((ret ""))
-      (yaxception:$
-        (yaxception:try
-          (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
-        (yaxception:catch 'error e
-          (setq ret (yaxception:get-prop e 'yax-b))))
-      ret))
-  (desc "get-prop not exist")
-  (expect nil
-    (let ((ret ""))
-      (yaxception:$
-        (yaxception:try
-          (replace-regexp-in-string " " "" 'yaxception-active-p))
-        (yaxception:catch 'error e
-          (setq ret (yaxception:get-prop e 'something))))
-      ret))
-  )
-
+(ert-deftest get-prop ()
+  "get-prop"
+  (unwind-protect
+      (let (err)
+        (define-error 'yaxception-test-error "This is YAX test" 'void-function)
+        (yaxception:$
+          (yaxception:try
+            (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga"))
+          (yaxception:catch 'error e
+            (setq err e)))
+        (should (equal (yaxception:get-prop err :yax-a) "hoge"))
+        (should (equal (yaxception:get-prop err :yax-b) "fuga"))
+        (should (equal (yaxception:get-prop err 'yax-a) "hoge"))
+        (should (equal (yaxception:get-prop err :yax-c) nil)))
+    (setplist 'yaxception-test-error nil)))

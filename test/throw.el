@@ -1,50 +1,31 @@
 (require 'yaxception)
-(require 'el-expectations)
 
-(expectations
-  (desc "throw")
-  (expect "File error"
-    (let ((msg ""))
-      (condition-case err
-          (yaxception:throw 'file-error)
-        (error (setq msg (error-message-string err))))
-      msg))
-  (desc "throw re")
-  (expect t
-    (let ((msg ""))
-      (condition-case err
-          (yaxception:$
-            (yaxception:try
-              (delete-file "not found")
-              (setq msg "ok"))
-            (yaxception:catch 'error e
-              (yaxception:throw e)))
-        (error (setq msg (error-message-string err))))
-      (and (string-match "\\`Removing old name: " msg) t)))
-  (desc "throw error")
-  (expect "File error"
-    (let ((msg ""))
-      (condition-case err
-          (yaxception:$
-            (yaxception:try
-              (delete-file "not found")
-              (setq msg "ok"))
-            (yaxception:catch 'error e
-              (yaxception:throw 'file-error)))
-        (error (setq msg (error-message-string err))))
-      msg))
-  (desc "throw custom error")
-  (expect "This is YAX 'hoge' test."
-    (yaxception:deferror 'yaxception-test-error 'file-error "This is YAX '%s' test." 'yax-a)
-    (let ((msg ""))
-      (condition-case err
-          (yaxception:$
-            (yaxception:try
-              (delete-file "not found")
-              (setq msg "ok"))
-            (yaxception:catch 'error e
-              (yaxception:throw 'yaxception-test-error :yax-a "hoge" :yax-b "fuga")))
-        (error (setq msg (error-message-string err))))
-      msg))
-  )
+(ert-deftest throw/on-outside-of-catch ()
+  "throw on outside of catch"
+  (should-error
+   (yaxception:throw 'wrong-type-argument)
+   :type 'wrong-type-argument))
 
+(ert-deftest throw/original-in-catch ()
+  "throw original error in catch"
+  (should-error
+   (yaxception:$
+     (yaxception:try
+       (delete-file 'hoge))
+     (yaxception:catch 'error e
+       (yaxception:throw e)))
+   :type 'wrong-type-argument))
+
+(ert-deftest throw/custom-in-catch ()
+  "throw custom error in catch"
+  (unwind-protect
+      (progn
+        (define-error 'yaxception-test-error "This is YAX test" 'void-function)
+        (should-error
+         (yaxception:$
+           (yaxception:try
+             (delete-file 'hoge))
+           (yaxception:catch 'error e
+             (yaxception:throw 'yaxception-test-error :yax-a "hoge")))
+       :type 'yaxception-test-error))
+    (setplist 'yaxception-test-error nil)))

@@ -1,37 +1,46 @@
 (require 'yaxception)
-(require 'el-expectations)
 
-(expectations
-  (desc "finally do")
-  (expect "CaughtFinished"
-    (let ((msg ""))
-      (yaxception:$
-        (yaxception:try
-          (delete-file "not found")
-          (setq msg (concat msg "OK")))
-        (yaxception:catch 'error e
-          (setq msg (concat msg "Caught")))
-        (yaxception:finally
-          (setq msg (concat msg "Finished"))))
-      msg))
-  (desc "finally do nest")
-  (expect "ThrowingFinishedCaughtComplete"
-    (let ((msg ""))
-      (yaxception:$
-        (yaxception:try
-          (yaxception:$
-            (yaxception:try
-              (delete-file "not found")
-              (setq msg (concat msg "OK")))
-            (yaxception:catch 'error e
-              (setq msg (concat msg "Throwing"))
-              (yaxception:throw e))
-            (yaxception:finally
-              (setq msg (concat msg "Finished")))))
-        (yaxception:catch 'error e
-          (setq msg (concat msg "Caught")))
-        (yaxception:finally
-          (setq msg (concat msg "Complete"))))
-      msg))
-  )
+(ert-deftest finally/without-error ()
+  "finally without error"
+  (let ((msg ""))
+    (yaxception:$
+      (yaxception:try
+        (setq msg (concat msg "OK")))
+      (yaxception:catch 'error e
+        (setq msg (concat msg "Caught")))
+      (yaxception:finally
+        (setq msg (concat msg "Finished"))))
+    (should (equal msg "OKFinished"))))
 
+(ert-deftest finally/with-error ()
+  "finally with error"
+  (let ((msg ""))
+    (yaxception:$
+      (yaxception:try
+        (delete-file 'hoge)
+        (setq msg (concat msg "OK")))
+      (yaxception:catch 'error e
+        (setq msg (concat msg "Caught")))
+      (yaxception:finally
+        (setq msg (concat msg "Finished"))))
+    (should (equal msg "CaughtFinished"))))
+
+(ert-deftest finally/nest ()
+  "finally on nest"
+  (let ((msg ""))
+    (yaxception:$
+      (yaxception:try
+        (yaxception:$
+          (yaxception:try
+            (delete-file 'hoge)
+            (setq msg (concat msg "OK")))
+          (yaxception:catch 'error e
+            (setq msg (concat msg "Throwing"))
+            (yaxception:throw e))
+          (yaxception:finally
+            (setq msg (concat msg "Finished")))))
+      (yaxception:catch 'error e
+        (setq msg (concat msg "Caught")))
+      (yaxception:finally
+        (setq msg (concat msg "Complete"))))
+    (should (equal msg "ThrowingFinishedCaughtComplete"))))
