@@ -1,7 +1,5 @@
 #+OPTIONS: toc:nil
 
-[[travis-build:aki2o/yaxception#master]]
-
 * What's this?
   
   This is a extension of Emacs provides framework about exception like Java for Elisp.  
@@ -24,22 +22,6 @@
     (yaxception:throw e))
   (yaxception:finally
     (message "finished doing")))
-    #+END_SRC
-
-*** Customized Error
-
-    For customizing error, you can write like the following.  
-
-    #+BEGIN_SRC lisp
-;; define hoge-error as child of file-error
-(yaxception:deferror 'hoge-error
-                     'file-error
-                     "Errored by hoge file - path:[%s] size:[%s]" 'path 'size)
-
-;; raise customized error
-(yaxception:throw 'hoge-error
-                  :path "c:/hoge.txt"
-                  :size (nth 7 (file-attributes "c:/hoge.txt")))
     #+END_SRC
 
 *** Stacktrace like Java
@@ -85,145 +67,5 @@ Exception is 'wrong-type-argument'. Wrong type argument: sequencep, hogege
     I want to list macro, but I don't know the way that discriminate macro from builtin special-form.
 
   
-* Install
-  
-*** If use package.el
-
-    2013/07/19 It's available by using melpa.  
-
-*** If use el-get.el
-
-    2013/07/26 It's available. But, master branch only.  
-
-*** If use auto-install.el
-    
-    #+BEGIN_SRC lisp
-(auto-install-from-url "https://raw.github.com/aki2o/yaxception/master/yaxception.el")
-    #+END_SRC
-    
-*** Manually
-    
-    Download yaxception.el and put it on your load-path.  
-    
-      
-* Usage
-
-*** Initially
-
-    Write the following in the elisp.
-    
-    #+BEGIN_SRC lisp
-(require 'yaxception)
-    #+END_SRC
-
-*** Start handling exception
-
-    Use =yaxception:$= for starting handling exception.  
-    =yaxception:$= receive the following arguments.  
-
-    1. A sexp of =yaxception:try= .
-    2. The sexp of =yaxception:catch= or =yaxception:finally=. This is optional.
-
-    =yaxception:$= has the following specification.  
-
-    - If error is happened while run =yaxception:try=, run =yaxception:catch= that match it first.
-      About matching, see "Match exception" section below.
-    - If not use =yaxception:catch= matched the happened error, raise its error.
-    - Use =yaxception:finally= only once.
-    - If has =yaxception:finally=, execute it at last without relation to if error was happened.
-    - Return the value that last run sexp other than =yaxception:finally= return.
-
-*** Catch exception
-
-    Use =yaxception:catch= for each error which you want to catch.  
-    
-    #+BEGIN_SRC lisp
-(yaxception:catch
-
-    ;; The error which you want to catch
-    'error
-    
-    ;; The variable which you want to use as the error
-    err
-    
-    ;; If catch the error, run and return the last sexp returned
-    (message "Error happened by something : %s" (yaxception:get-text err))
-    (yaxception:throw err))
-    #+END_SRC
-
-*** Match exception
-
-    Error symbol has =error-conditions=. e.g. =file-error= has =(file-error error)=.  
-    If happen =file-error=,  
-    run =(yaxception:catch 'file-error ...)= or =(yaxception:catch 'error ...)= first.
-
-*** Throw exception
-
-    You can use =yaxception:throw= to signal error anywhere.  
-    =yaxception:throw= has the following way for use.
-    
-    #+BEGIN_SRC lisp
-;; Throw the error object directly
-(yaxception:throw err)
-
-;; Signal the error of the symbol
-(yaxception:throw 'file-error)
-
-;; If signal, you can give the keyword arguments.
-;; Their value is replaced with the special part of the error message.
-;; You can get them by yaxception:get-prop.
-(yaxception:throw 'hoge-error
-                  :path "c:/hoge.txt"
-                  :size (nth 7 (file-attributes "c:/hoge.txt")))
-    #+END_SRC
-
-*** Customize exception
-
-    You can use =yaxception:deferror= to define the customized error.  
-    
-    #+BEGIN_SRC lisp
-(yaxception:deferror
-
- ;; The error symbol. It's OK that it's defined not yet.
- 'hoge-error
- 
- ;; THe parent of the error. If nil, this value is 'error.
- 'file-error
- 
- ;; The message of the error. This value is passed to format.
- "Errored by hoge file - path:[%s] size:[%s]"
- 
- ;; The keyword symbol replaced with the special part (e.g. %s) of the above message.
- ;; See "Throw exception" section above.
- 'path 'size)
-    #+END_SRC
-
-*** Other
-
-    For getting the message of the error, you can use =yaxception:get-text=.  
-    For getting the property of the error, you can use =yaxception:get-prop=.  
-    For getting the stacktrace of the error, you can use =yaxception:get-stack-trace-string=.
-
-  
-* Consideration
-
-*** Get stack trace with keep performance
-
-    =yaxception:$= makes a stack trace using =signal-hook-function= when error happens.  
-    Normarlly, the cost almost don't come a trouble. However, it happens a slowness in a few case.  
-    At present, here is the well-known cases.  
-    
-    - use the features of =defclass=
-
-    If your code matches them in =yaxception:$=, it's recommended to use =yaxception:$~=
-    as substitute for that.  
-    =yaxception:$~= keeps a performance in exchange for not making a stack trace.  
-
-    
-* Tested On
-  
-  - Emacs ... GNU Emacs 23.3.1 (i386-mingw-nt5.1.2600) of 2011-08-15 on GNUPACK
-    
-    
   *Enjoy!!!*
   
